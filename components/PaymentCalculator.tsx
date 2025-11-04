@@ -174,10 +174,18 @@ function PaymentCalculator({ payment: initialPayment, isEditMode, setIsEditMode 
         </div>
       </div>
 
-      {isEditMode && (
+      {isEditMode ? (
         <div className='lg:col-span-3 lg:row-start-2'>
           <ReceiptUploader onReceiptParsed={handleReceiptParsed} hasItems={items.length > 0} initialReceiptImageUrl={receiptImageUrl} />
         </div>
+      ) : (
+        receiptImageUrl && (
+          <div className='lg:col-span-3 lg:row-start-2'>
+            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 flex justify-center items-center">
+              <img src={receiptImageUrl} alt="Receipt" className="max-h-96 rounded-md" />
+            </div>
+          </div>
+        )
       )}
 
       {isEditMode && (
