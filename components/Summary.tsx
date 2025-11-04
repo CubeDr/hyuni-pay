@@ -81,7 +81,7 @@ const Summary: React.FC<SummaryProps> = ({ id, items, payers }) => {
       }
     });
 
-    textToCopy += `\n${process.env.PAYMENT_BANK_ACCOUNT}\nhttps://pay.hyuni.dev/${id}`;
+    textToCopy += `\n${process.env.PAYMENT_BANK_ACCOUNT}\nhttps://pay.hyuni.dev#${id}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true);
