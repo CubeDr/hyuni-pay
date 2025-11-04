@@ -3,6 +3,7 @@ import { Item, Payer } from '../types';
 import { CopyIcon, CheckIcon } from './icons';
 
 interface SummaryProps {
+  id: string;
   items: Item[];
   payers: Payer[];
 }
@@ -14,7 +15,7 @@ interface PayerSummary {
   individualItems: Item[];
 }
 
-const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
+const Summary: React.FC<SummaryProps> = ({ id, items, payers }) => {
   const [copied, setCopied] = useState(false);
 
   const summaryData = useMemo(() => {
@@ -80,7 +81,7 @@ const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
       }
     });
 
-    textToCopy += `\n${process.env.PAYMENT_BANK_ACCOUNT}\n`;
+    textToCopy += `\n${process.env.PAYMENT_BANK_ACCOUNT}\nhttps://pay.hyuni.dev/${id}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true);

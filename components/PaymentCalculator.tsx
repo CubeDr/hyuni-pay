@@ -172,7 +172,7 @@ function PaymentCalculator({ payment: initialPayment, isEditMode, setDraftPaymen
       <div className='lg:col-span-2 lg:row-start-3'>
         {items.length > 0 && (
           <div className='sticky top-28'>
-            <Summary items={items} payers={payers} />
+            <Summary id={initialPayment.id} items={items} payers={payers} />
           </div>
         )}
       </div>
