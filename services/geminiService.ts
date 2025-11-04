@@ -32,20 +32,12 @@ const receiptSchema = {
         required: ["name", "quantity", "price", "isLikelyShared"],
       },
     },
-    tax: {
-      type: Type.NUMBER,
-      description: "Total tax amount on the receipt. If not found, should be 0.",
-    },
-    tip: {
-      type: Type.NUMBER,
-      description: "Total tip or gratuity amount on the receipt. If not found, should be 0.",
-    },
     total: {
       type: Type.NUMBER,
       description: "The final total amount on the receipt.",
     },
   },
-  required: ["items", "tax", "tip", "total"],
+  required: ["items", "total"],
 };
 
 export const parseReceiptFromImage = async (
@@ -63,7 +55,7 @@ export const parseReceiptFromImage = async (
             },
           },
           {
-            text: "Analyze this receipt image from Korea. The currency is KRW (Korean Won). Extract all line items with their quantity and price. For each item, determine if it is likely a shared dish (like an appetizer, pajeon, jjigae, etc.) or an individual dish (like a personal drink or a single bowl of rice). Set the 'isLikelyShared' flag accordingly. Also extract the tax, tip, and total amount. Provide the output in the specified JSON format. All monetary values (price, tax, tip, total) must be integers, without any decimal points.",
+            text: "Analyze this receipt image from Korea. The currency is KRW (Korean Won). Extract all line items with their quantity and price. For each item, determine if it is likely a shared dish (like an appetizer, pajeon, jjigae, etc.) or an individual dish (like a personal drink or a single bowl of rice). Set the 'isLikelyShared' flag accordingly. Also extract the total amount. Provide the output in the specified JSON format. All monetary values (price, total) must be integers, without any decimal points.",
           },
         ],
       },
@@ -75,10 +67,10 @@ export const parseReceiptFromImage = async (
 
     const jsonText = response.text.trim();
     const parsedData = JSON.parse(jsonText);
-    
+
     // Validate the parsed data shape
-    if (!parsedData.items || typeof parsedData.tax !== 'number' || typeof parsedData.tip !== 'number') {
-        throw new Error("Parsed data is missing required fields.");
+    if (!parsedData.items) {
+      throw new Error("Parsed data is missing required fields.");
     }
 
     return parsedData as ReceiptData;

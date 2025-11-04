@@ -14,16 +14,14 @@ export interface Payer {
 }
 
 export interface ParsedItem {
-    name: string;
-    quantity: number;
-    price: number;
-    isLikelyShared: boolean;
+  name: string;
+  quantity: number;
+  price: number;
+  isLikelyShared: boolean;
 }
 
 export interface ReceiptData {
   items: ParsedItem[];
-  tax: number;
-  tip: number;
   total: number;
 }
 
@@ -33,6 +31,4 @@ export interface Payment {
   date: string;
   items: Item[];
   payers: Payer[];
-  tax: number;
-  tip: number;
 }
