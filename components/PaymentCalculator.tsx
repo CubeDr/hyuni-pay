@@ -6,6 +6,7 @@ import ItemList from './ItemList';
 import Summary from './Summary';
 import { db } from '../services/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
+import { EditIcon, SaveIcon } from './icons';
 
 function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
   let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -31,6 +32,7 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
   const [receiptImageUrl, setReceiptImageUrl] = useState<string | undefined>(initialPayment.receiptImageUrl);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('All changes saved');
+  const [isEditMode, setIsEditMode] = useState(false); // New state for edit mode
 
   const debouncedSave = useCallback(
     debounce(async (paymentData: Payment) => {
@@ -154,28 +156,45 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-5 gap-8'>
       <div className='lg:col-span-5 flex justify-between items-center'>
-        <input
-          type='text'
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className='text-3xl font-bold text-white bg-transparent border-0 border-b-2 border-slate-700 focus:border-cyan-500 focus:outline-none focus:ring-0 p-2 -ml-2 w-full'
-          placeholder='Enter payment title'
-        />
-        <div className='text-slate-400 text-sm whitespace-nowrap pl-4'>
-          {isSaving ? 'Saving...' : saveStatus}
+        {isEditMode ? (
+          <input
+            type='text'
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className='text-3xl font-bold text-white bg-transparent border-0 border-b-2 border-slate-700 focus:border-cyan-500 focus:outline-none focus:ring-0 p-2 -ml-2 w-full'
+            placeholder='Enter payment title'
+          />
+        ) : (
+          <h1 className='text-3xl font-bold text-white p-2 -ml-2'>{title}</h1>
+        )}
+        <div className='flex items-center gap-4'>
+          <div className='text-slate-400 text-sm whitespace-nowrap'>
+            {isSaving ? 'Saving...' : saveStatus}
+          </div>
+          <button
+            onClick={() => setIsEditMode(!isEditMode)}
+            className='p-2 rounded-full hover:bg-slate-700 transition-colors text-white'
+            aria-label={isEditMode ? 'Save changes' : 'Edit payment'}
+          >
+            {isEditMode ? <SaveIcon className='w-6 h-6' /> : <EditIcon className='w-6 h-6' />}
+          </button>
         </div>
       </div>
 
-      <div className='lg:col-span-3 lg:row-start-2'>
-        <ReceiptUploader onReceiptParsed={handleReceiptParsed} hasItems={items.length > 0} initialReceiptImageUrl={receiptImageUrl} />
-      </div>
-
-      <div className='lg:col-span-2 lg:row-start-2'>
-        <div className='bg-slate-800 rounded-xl p-6 border border-slate-700'>
-          <h2 className='text-2xl font-bold mb-4'>Who's Paying?</h2>
-          <PayerManager payers={payers} onAddPayer={handleAddPayer} onRemovePayer={handleRemovePayer} />
+      {isEditMode && (
+        <div className='lg:col-span-3 lg:row-start-2'>
+          <ReceiptUploader onReceiptParsed={handleReceiptParsed} hasItems={items.length > 0} initialReceiptImageUrl={receiptImageUrl} />
         </div>
-      </div>
+      )}
+
+      {isEditMode && (
+        <div className='lg:col-span-2 lg:row-start-2'>
+          <div className='bg-slate-800 rounded-xl p-6 border border-slate-700'>
+            <h2 className='text-2xl font-bold mb-4'>Who's Paying?</h2>
+            <PayerManager payers={payers} onAddPayer={handleAddPayer} onRemovePayer={handleRemovePayer} />
+          </div>
+        </div>
+      )}
 
       <div className='lg:col-span-3 lg:row-start-3'>
         {items.length > 0 && (
@@ -184,6 +203,7 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
             payers={payers}
             onTogglePayer={handleTogglePayerForItem}
             onToggleShared={handleToggleShared}
+            isEditMode={isEditMode}
           />
         )}
       </div>
@@ -200,4 +220,3 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
 }
 
 export default PaymentCalculator;
-
