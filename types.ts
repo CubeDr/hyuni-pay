@@ -31,4 +31,5 @@ export interface Payment {
   date: string;
   items: Item[];
   payers: Payer[];
+  receiptImageUrl?: string;
 }

@@ -28,6 +28,7 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
   const [title, setTitle] = useState<string>(initialPayment.title);
   const [items, setItems] = useState<Item[]>(initialPayment.items);
   const [payers, setPayers] = useState<Payer[]>(initialPayment.payers);
+  const [receiptImageUrl, setReceiptImageUrl] = useState<string | undefined>(initialPayment.receiptImageUrl);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('All changes saved');
 
@@ -52,7 +53,8 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
     const hasChanged =
       title !== initialPayment.title ||
       items !== initialPayment.items ||
-      payers !== initialPayment.payers;
+      payers !== initialPayment.payers ||
+      receiptImageUrl !== initialPayment.receiptImageUrl;
 
     if (hasChanged) {
       setSaveStatus('Unsaved changes');
@@ -62,12 +64,14 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
         title,
         items,
         payers,
+        receiptImageUrl,
       };
       debouncedSave(currentPayment);
     }
-  }, [title, items, payers, initialPayment, debouncedSave]);
+  }, [title, items, payers, receiptImageUrl, initialPayment, debouncedSave]);
 
-  const handleReceiptParsed = (data: ReceiptData) => {
+  const handleReceiptParsed = (data: ReceiptData, imageUrl: string) => {
+    setReceiptImageUrl(imageUrl);
     const expandedItems: ({ id: string; name: string; quantity: number; price: number; isLikelyShared: boolean; })[] = [];
     data.items.forEach(item => {
       if (item.quantity > 1) {
@@ -160,7 +164,7 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
       </div>
 
       <div className='lg:col-span-3 lg:row-start-2'>
-        <ReceiptUploader onReceiptParsed={handleReceiptParsed} hasItems={items.length > 0} />
+        <ReceiptUploader onReceiptParsed={handleReceiptParsed} hasItems={items.length > 0} initialReceiptImageUrl={receiptImageUrl} />
       </div>
 
       <div className='lg:col-span-2 lg:row-start-2'>
@@ -193,3 +197,4 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
 }
 
 export default PaymentCalculator;
+

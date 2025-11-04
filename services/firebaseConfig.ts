@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8qzhcIri89ZTlcHk0uaI5TFI4FBgJ_yI",
@@ -13,5 +14,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-export { db };
+export { db, storage };
+
+export const uploadReceiptImage = async (file: File): Promise<string> => {
+  const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${file.name}`;
+  const storageRef = ref(storage, `receipts/${uniqueFileName}`);
+  const snapshot = await uploadBytes(storageRef, file);
+  const downloadURL = await getDownloadURL(snapshot.ref);
+  return downloadURL;
+};

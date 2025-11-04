@@ -1,22 +1,30 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { parseReceiptFromImage } from '../services/geminiService';
 import { fileToBase64 } from '../utils/fileUtils';
 import { ReceiptData } from '../types';
 import Spinner from './Spinner';
 import { UploadIcon } from './icons';
+import { uploadReceiptImage } from '../services/firebaseConfig';
 
 interface ReceiptUploaderProps {
-  onReceiptParsed: (data: ReceiptData) => void;
+  onReceiptParsed: (data: ReceiptData, receiptImageUrl: string) => void;
   hasItems: boolean;
+  initialReceiptImageUrl?: string;
 }
 
-const ReceiptUploader: React.FC<ReceiptUploaderProps> = ({ onReceiptParsed, hasItems }) => {
+const ReceiptUploader: React.FC<ReceiptUploaderProps> = ({ onReceiptParsed, hasItems, initialReceiptImageUrl }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialReceiptImageUrl || null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (initialReceiptImageUrl && !selectedFile) {
+      setPreviewUrl(initialReceiptImageUrl);
+    }
+  }, [initialReceiptImageUrl, selectedFile]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -38,12 +46,13 @@ const ReceiptUploader: React.FC<ReceiptUploaderProps> = ({ onReceiptParsed, hasI
     setError(null);
 
     try {
+      const receiptImageUrl = await uploadReceiptImage(selectedFile);
       const base64Data = await fileToBase64(selectedFile);
       const parsedData = await parseReceiptFromImage({
         mimeType: selectedFile.type,
         data: base64Data,
       });
-      onReceiptParsed(parsedData);
+      onReceiptParsed(parsedData, receiptImageUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
     } finally {
