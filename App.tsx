@@ -11,11 +11,11 @@ function App() {
 
   const handleCreateNewPayment = async () => {
     const newPayment: Payment = {
-      id: crypto.randomUUID(),
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
       title: 'New Payment',
       date: new Date().toISOString(),
       items: [],
-      payers: [{ id: crypto.randomUUID(), name: '현이' }],
+      payers: [{ id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5), name: '현이' }],
     };
 
     try {

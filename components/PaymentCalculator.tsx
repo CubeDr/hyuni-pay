@@ -74,7 +74,7 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
         const singleItemPrice = Math.round(item.price / item.quantity);
         for (let i = 0; i < item.quantity; i++) {
           expandedItems.push({
-            id: crypto.randomUUID(),
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
             name: item.name,
             quantity: 1,
             price: singleItemPrice,
@@ -84,7 +84,7 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
       } else {
         expandedItems.push({
           ...item,
-          id: crypto.randomUUID(),
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
         });
       }
     });
@@ -107,7 +107,7 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
 
   const handleAddPayer = (name: string) => {
     if (name && !payers.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-      setPayers([...payers, { id: crypto.randomUUID(), name }]);
+      setPayers([...payers, { id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5), name }]);
     }
   };
 
