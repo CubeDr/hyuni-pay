@@ -6,7 +6,6 @@ import ItemList from './ItemList';
 import Summary from './Summary';
 import { db } from '../services/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
-import { EditIcon, SaveIcon } from './icons';
 
 function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
   let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -23,16 +22,17 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
 
 interface PaymentCalculatorProps {
   payment: Payment;
+  isEditMode: boolean;
+  setIsEditMode: (isEditMode: boolean) => void;
 }
 
-function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) {
+function PaymentCalculator({ payment: initialPayment, isEditMode, setIsEditMode }: PaymentCalculatorProps) {
   const [title, setTitle] = useState<string>(initialPayment.title);
   const [items, setItems] = useState<Item[]>(initialPayment.items);
   const [payers, setPayers] = useState<Payer[]>(initialPayment.payers);
   const [receiptImageUrl, setReceiptImageUrl] = useState<string | undefined>(initialPayment.receiptImageUrl);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('All changes saved');
-  const [isEditMode, setIsEditMode] = useState(false); // New state for edit mode
 
   const debouncedSave = useCallback(
     debounce(async (paymentData: Payment) => {
@@ -171,13 +171,6 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
           <div className='text-slate-400 text-sm whitespace-nowrap'>
             {isSaving ? 'Saving...' : saveStatus}
           </div>
-          <button
-            onClick={() => setIsEditMode(!isEditMode)}
-            className='p-2 rounded-full hover:bg-slate-700 transition-colors text-white'
-            aria-label={isEditMode ? 'Save changes' : 'Edit payment'}
-          >
-            {isEditMode ? <SaveIcon className='w-6 h-6' /> : <EditIcon className='w-6 h-6' />}
-          </button>
         </div>
       </div>
 
