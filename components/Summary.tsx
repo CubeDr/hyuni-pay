@@ -67,11 +67,10 @@ const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
   const grandTotal = items.reduce((acc, i) => acc + i.price, 0);
 
   const handleCopy = () => {
-    let textToCopy = "현이 페이 정산:\n\n";
+    let textToCopy = `현이 페이 정산: ₩${grandTotal.toLocaleString()}\n\n`;
 
     if (summaryData.sharedItems.length > 0) {
-      textToCopy += `공동 (1인당 ₩${summaryData.perPersonSharedCost.toLocaleString()}):\n`;
-      textToCopy += `- ${summaryData.sharedItems.map(i => i.name).join(', ')}\n\n`;
+      textToCopy += `공동: ${summaryData.sharedItems.map(i => i.name).join(', ')}\n\n`;
     }
 
     summaryData.totals.forEach(t => {
@@ -81,7 +80,7 @@ const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
       }
     });
 
-    textToCopy += `\n총액: ₩${grandTotal.toLocaleString()}`;
+    textToCopy += `\n${process.env.PAYMENT_BANK_ACCOUNT}\n`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true);
