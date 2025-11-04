@@ -23,23 +23,20 @@ const ItemRow: React.FC<{ item: Item; payers: Payer[]; onTogglePayer: (itemId: s
         <p className="font-mono text-lg font-medium text-white">₩{item.price.toLocaleString()}</p>
       </div>
       <div className="mt-3 pt-3 border-t border-slate-700">
-        <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-slate-300">Paid by:</span>
-        </div>
         <div className="flex flex-wrap gap-2 mt-2">
-           <button
-                onClick={() => isEditMode && onToggleShared(item.id)}
-                title="Toggle Shared Item"
-                disabled={!isEditMode}
-                className={`h-8 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-all duration-200 px-3 gap-1.5
+          <button
+            onClick={() => isEditMode && onToggleShared(item.id)}
+            title="Toggle Shared Item"
+            disabled={!isEditMode}
+            className={`h-8 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-all duration-200 px-3 gap-1.5
                     ${item.isShared ? `bg-cyan-500 border-transparent text-white` : 'bg-slate-600 border-slate-600 hover:border-slate-400 text-slate-300'}
                     ${!isEditMode && 'opacity-50 cursor-not-allowed'}
                 `}
-            >
-                <UsersIcon className="w-4 h-4" />
-                <span>Shared</span>
-            </button>
-          
+          >
+            <UsersIcon className="w-4 h-4" />
+            <span>Shared</span>
+          </button>
+
           {!item.isShared && payers.map((payer, index) => {
             const isSelected = item.payers.includes(payer.id);
             return (
@@ -70,7 +67,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, payers, onTogglePayer, onTog
       <h2 className="text-2xl font-bold">Itemized List</h2>
       <div className="space-y-3">
         {items.map(item => (
-          <ItemRow key={item.id} item={item} payers={payers} onTogglePayer={onTogglePayer} onToggleShared={onToggleShared} isEditMode={isEditMode}/>
+          <ItemRow key={item.id} item={item} payers={payers} onTogglePayer={onTogglePayer} onToggleShared={onToggleShared} isEditMode={isEditMode} />
         ))}
       </div>
     </div>
