@@ -67,21 +67,21 @@ const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
   const grandTotal = items.reduce((acc, i) => acc + i.price, 0);
 
   const handleCopy = () => {
-    let textToCopy = "Hyuni Pay Summary:\n\n";
+    let textToCopy = "현이 페이 정산:\n\n";
 
     if (summaryData.sharedItems.length > 0) {
-      textToCopy += `Shared Items (₩${summaryData.perPersonSharedCost.toLocaleString()} per person):\n`;
+      textToCopy += `공동 (1인당 ₩${summaryData.perPersonSharedCost.toLocaleString()}):\n`;
       textToCopy += `- ${summaryData.sharedItems.map(i => i.name).join(', ')}\n\n`;
     }
 
     summaryData.totals.forEach(t => {
       textToCopy += `${t.name}: ₩${t.totalAmount.toLocaleString()}\n`;
       if (t.individualItems.length > 0) {
-        textToCopy += `  (Items: ${t.individualItems.map(i => i.name).join(', ')})\n`;
+        textToCopy += `  (${t.individualItems.map(i => i.name).join(', ')})\n`;
       }
     });
 
-    textToCopy += `\nTotal: ₩${grandTotal.toLocaleString()}`;
+    textToCopy += `\n총액: ₩${grandTotal.toLocaleString()}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true);
@@ -91,21 +91,21 @@ const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
 
   return (
     <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-      <h2 className="text-2xl font-bold mb-4">Summary</h2>
+      <h2 className="text-2xl font-bold mb-4">정산</h2>
       <div className="space-y-4">
         {/* Shared Items Row */}
         {summaryData.sharedItems.length > 0 && (
           <div className="pb-3 border-b border-slate-700">
             <div className="flex justify-between items-start text-lg">
               <div className="flex-1">
-                <span className="font-medium text-slate-300">Shared Items</span>
+                <span className="font-medium text-slate-300">공동</span>
                 <p className="text-sm text-slate-400 mt-1">
                   {summaryData.sharedItems.map(i => i.name).join(', ')}
                 </p>
               </div>
               <div className="text-right ml-4">
                 <span className="font-mono font-semibold text-white">₩{summaryData.perPersonSharedCost.toLocaleString()}</span>
-                <p className="text-xs text-slate-500">per person</p>
+                <p className="text-xs text-slate-500">1인당</p>
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
       </div>
       <hr className="border-slate-600 my-4" />
       <div className="flex justify-between items-center text-xl font-bold">
-        <span className="text-cyan-400">Grand Total</span>
+        <span className="text-cyan-400">총액</span>
         <span className="text-cyan-400">₩{grandTotal.toLocaleString()}</span>
       </div>
       <button
@@ -136,7 +136,7 @@ const Summary: React.FC<SummaryProps> = ({ items, payers }) => {
         className="w-full mt-6 bg-slate-700 text-slate-200 font-bold py-3 px-4 rounded-lg hover:bg-slate-600 flex items-center justify-center gap-2 transition-colors"
       >
         {copied ? <CheckIcon className="w-5 h-5 text-green-400" /> : <CopyIcon className="w-5 h-5" />}
-        {copied ? 'Copied to Clipboard!' : 'Copy Summary'}
+        {copied ? '클립보드에 복사되었습니다!' : '요약 복사'}
       </button>
     </div>
   );
