@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import HomePage from './components/HomePage';
 import PaymentCalculator from './components/PaymentCalculator';
 import { Payment } from './types';
-import { BackIcon, EditIcon, SaveIcon, MenuIcon, TrashIcon } from './components/icons';
+import { BackIcon, EditIcon, SaveIcon, MenuIcon, TrashIcon, CheckIcon } from './components/icons';
 import { db, deleteReceiptImage } from './services/firebaseConfig';
 import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 
 function App() {
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [activePayment, setActivePayment] = useState<Payment | null>(null);
+  const [draftPayment, setDraftPayment] = useState<Payment | null>(null);
   const [loadingPayment, setLoadingPayment] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false); // State for edit mode
   const [showMenu, setShowMenu] = useState(false); // State for menu visibility
@@ -87,6 +88,12 @@ function App() {
     window.location.hash = '';
   };
 
+  const updatePayment = async (payment: Payment) => {
+    await setDoc(doc(db, 'payments', payment.id), payment);
+    setIsEditMode(false);
+    setDraftPayment(null);
+  };
+
   const handleDeletePayment = async () => {
     if (activePayment && window.confirm('Are you sure you want to delete this payment? This action cannot be undone.')) {
       try {
@@ -154,11 +161,12 @@ function App() {
                 </div>
               ) : (
                 <button
-                  onClick={() => setIsEditMode(false)}
-                  className='p-2 rounded-full hover:bg-slate-700 transition-colors text-white'
+                  onClick={() => updatePayment(draftPayment)}
+                  className='p-2 rounded-full not-disabled:hover:bg-slate-700 transition-colors text-white disabled:text-opacity-20'
                   aria-label='Save changes'
+                  disabled={!draftPayment}
                 >
-                  <SaveIcon className='w-6 h-6' />
+                  <CheckIcon className='w-6 h-6' />
                 </button>
               )}
             </div>
@@ -173,7 +181,11 @@ function App() {
             !paymentId ? (
               <HomePage onNewPayment={handleCreateNewPayment} onSelectPayment={handleSelectPayment} />
             ) : (
-              activePayment && <PaymentCalculator payment={activePayment} isEditMode={isEditMode} setIsEditMode={setIsEditMode} />
+              activePayment && <PaymentCalculator
+                payment={activePayment}
+                isEditMode={isEditMode}
+                setIsEditMode={setIsEditMode}
+                setDraftPayment={setDraftPayment} />
             )
           )}
         </div>

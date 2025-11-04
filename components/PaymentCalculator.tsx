@@ -1,76 +1,41 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Payment, Item, Payer, ReceiptData } from '../types';
-import ReceiptUploader from './ReceiptUploader';
-import PayerManager from './PayerManager';
+import { useState, useEffect } from 'react';
+import { Item, Payer, Payment, ReceiptData } from '../types';
 import ItemList from './ItemList';
+import PayerManager from './PayerManager';
+import ReceiptUploader from './ReceiptUploader';
 import Summary from './Summary';
-import { db } from '../services/firebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
-
-function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-
-  const debounced = (...args: Parameters<F>) => {
-    if (timeout !== null) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(() => func(...args), waitFor);
-  };
-
-  return debounced as (...args: Parameters<F>) => void;
-}
 
 interface PaymentCalculatorProps {
   payment: Payment;
   isEditMode: boolean;
   setIsEditMode: (isEditMode: boolean) => void;
+  setDraftPayment: (draftPayment: Payment) => void;
 }
 
-function PaymentCalculator({ payment: initialPayment, isEditMode, setIsEditMode }: PaymentCalculatorProps) {
+function PaymentCalculator({ payment: initialPayment, isEditMode, setDraftPayment }: PaymentCalculatorProps) {
   const [title, setTitle] = useState<string>(initialPayment.title);
   const [items, setItems] = useState<Item[]>(initialPayment.items);
   const [payers, setPayers] = useState<Payer[]>(initialPayment.payers);
   const [receiptImageUrl, setReceiptImageUrl] = useState<string | undefined>(initialPayment.receiptImageUrl);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState('All changes saved');
-
-  const debouncedSave = useCallback(
-    debounce(async (paymentData: Payment) => {
-      setIsSaving(true);
-      setSaveStatus('Saving...');
-      try {
-        await setDoc(doc(db, 'payments', paymentData.id), paymentData);
-        setSaveStatus('All changes saved');
-      } catch (error) {
-        console.error('Error saving payment: ', error);
-        setSaveStatus('Save failed');
-      } finally {
-        setIsSaving(false);
-      }
-    }, 1500),
-    [initialPayment.id]
-  );
 
   useEffect(() => {
-    const hasChanged =
-      title !== initialPayment.title ||
-      items !== initialPayment.items ||
-      payers !== initialPayment.payers ||
-      receiptImageUrl !== initialPayment.receiptImageUrl;
+    if (!isEditMode) return;
 
-    if (hasChanged) {
-      setSaveStatus('Unsaved changes');
-      const currentPayment: Payment = {
-        id: initialPayment.id,
-        date: initialPayment.date,
-        title,
-        items,
-        payers,
-        receiptImageUrl,
-      };
-      debouncedSave(currentPayment);
+    const draftPayment = {
+      ...initialPayment,
+      title,
+      items,
+      payers,
+      receiptImageUrl,
+    };
+
+    if (JSON.stringify(initialPayment) !== JSON.stringify(draftPayment)) {
+      setDraftPayment(draftPayment);
+    } else {
+      setDraftPayment(null);
     }
-  }, [title, items, payers, receiptImageUrl, initialPayment, debouncedSave]);
+
+  }, [isEditMode, initialPayment, title, items, payers, receiptImageUrl]);
 
   const handleReceiptParsed = (data: ReceiptData, imageUrl: string) => {
     setReceiptImageUrl(imageUrl);
@@ -167,11 +132,6 @@ function PaymentCalculator({ payment: initialPayment, isEditMode, setIsEditMode 
         ) : (
           <h1 className='text-3xl font-bold text-white p-2 -ml-2'>{title}</h1>
         )}
-        <div className='flex items-center gap-4'>
-          <div className='text-slate-400 text-sm whitespace-nowrap'>
-            {isSaving ? 'Saving...' : saveStatus}
-          </div>
-        </div>
       </div>
 
       {isEditMode ? (
