@@ -6,6 +6,10 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 const receiptSchema = {
   type: Type.OBJECT,
   properties: {
+    shopName: {
+      type: Type.STRING,
+      description: "The name of the shop or restaurant where the receipt was issued.",
+    },
     items: {
       type: Type.ARRAY,
       description: "List of all items purchased from the receipt.",
@@ -55,7 +59,7 @@ export const parseReceiptFromImage = async (
             },
           },
           {
-            text: "Analyze this receipt image from Korea. The currency is KRW (Korean Won). Extract all line items with their quantity and price. For each item, determine if it is likely a shared dish (like an appetizer, pajeon, jjigae, etc.) or an individual dish (like a personal drink or a single bowl of rice). Set the 'isLikelyShared' flag accordingly. Also extract the total amount. Provide the output in the specified JSON format. All monetary values (price, total) must be integers, without any decimal points.",
+            text: "Analyze this receipt image from Korea. The currency is KRW (Korean Won). Extract the name of the shop or restaurant. Extract all line items with their quantity and price. For each item, determine if it is likely a shared dish (like an appetizer, pajeon, jjigae, etc.) or an individual dish (like a personal drink or a single bowl of rice). Set the 'isLikelyShared' flag accordingly. Also extract the total amount. Provide the output in the specified JSON format. All monetary values (price, total) must be integers, without any decimal points.",
           },
         ],
       },

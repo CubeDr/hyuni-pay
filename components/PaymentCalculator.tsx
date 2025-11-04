@@ -72,6 +72,9 @@ function PaymentCalculator({ payment: initialPayment }: PaymentCalculatorProps) 
 
   const handleReceiptParsed = (data: ReceiptData, imageUrl: string) => {
     setReceiptImageUrl(imageUrl);
+    if (data.shopName) {
+      setTitle(data.shopName);
+    }
     const expandedItems: ({ id: string; name: string; quantity: number; price: number; isLikelyShared: boolean; })[] = [];
     data.items.forEach(item => {
       if (item.quantity > 1) {

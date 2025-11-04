@@ -23,6 +23,7 @@ export interface ParsedItem {
 export interface ReceiptData {
   items: ParsedItem[];
   total: number;
+  shopName?: string;
 }
 
 export interface Payment {
