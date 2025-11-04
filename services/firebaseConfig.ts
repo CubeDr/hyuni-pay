@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8qzhcIri89ZTlcHk0uaI5TFI4FBgJ_yI",
@@ -24,4 +24,19 @@ export const uploadReceiptImage = async (file: File): Promise<string> => {
   const snapshot = await uploadBytes(storageRef, file);
   const downloadURL = await getDownloadURL(snapshot.ref);
   return downloadURL;
+};
+
+export const deleteReceiptImage = async (imageUrl: string): Promise<void> => {
+  try {
+    const decodedUrl = decodeURIComponent(imageUrl);
+    const pathStartIndex = decodedUrl.indexOf('o/') + 2;
+    const pathEndIndex = decodedUrl.indexOf('?');
+    const filePath = decodedUrl.substring(pathStartIndex, pathEndIndex);
+
+    const imageRef = ref(storage, filePath);
+    await deleteObject(imageRef);
+    console.log("Receipt image deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting receipt image:", error);
+  }
 };

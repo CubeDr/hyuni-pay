@@ -3,7 +3,7 @@ import HomePage from './components/HomePage';
 import PaymentCalculator from './components/PaymentCalculator';
 import { Payment } from './types';
 import { BackIcon, EditIcon, SaveIcon, MenuIcon, TrashIcon } from './components/icons';
-import { db } from './services/firebaseConfig';
+import { db, deleteReceiptImage } from './services/firebaseConfig';
 import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 
 function App() {
@@ -90,6 +90,9 @@ function App() {
   const handleDeletePayment = async () => {
     if (activePayment && window.confirm('Are you sure you want to delete this payment? This action cannot be undone.')) {
       try {
+        if (activePayment.receiptImageUrl) {
+          await deleteReceiptImage(activePayment.receiptImageUrl);
+        }
         await deleteDoc(doc(db, 'payments', activePayment.id));
         window.location.hash = ''; // Go back to home page
       } catch (error) {
