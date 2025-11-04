@@ -73,6 +73,7 @@ function App() {
     try {
       await setDoc(doc(db, 'payments', newPayment.id), newPayment);
       window.location.hash = `#/${newPayment.id}`;
+      setIsEditMode(true); // Start in edit mode for new payments
     } catch (error) {
       console.error('Error creating new payment: ', error);
     }
